@@ -142,6 +142,14 @@ public class index {
 			file_headline.flush();
 			file_map.flush();
 		}
+		while(j<size_text) {
+			file_text.write(Integer.toString(i-1)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			j++;
+		}
+		while(w<size_headline) {
+			file_headline.write(Integer.toString(i-1)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			w++;
+		}
 		file_text.close();
 		file_headline.close();
 		file_map.close();
