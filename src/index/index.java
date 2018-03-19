@@ -11,26 +11,29 @@ public class index {
 		String pattern2 = "<TEXT>([\\s\\S]*?)</TEXT>";
 		//match DOCNO
 		String pattern3 = "<DOCNO>([\\s\\S]*?)</DOCNO>";
-		
-		String textFile = readFileByChars(args[0]);
+		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
 		//Matcher m1 = r1.matcher(text);
 		//Matcher m2 = r2.matcher(text);
 		//if (m1.find()) {
 			//pass
 		//} else {
-		
+		System.out.println("read successful");
 		//get result of Re.
-		resultOfRe headline = match(pattern1, textFile);
-		resultOfRe text = match(pattern2, textFile);
-		resultOfRe pagination = match(pattern3, textFile);
-		headline.changeTerms(removeAndCF(headline.getTerms()));
-		text.changeTerms(removeAndCF(text.getTerms()));
-		writeFileByFileWriter("Text.txt", text.getTerms());
-		writeFileByFileWriter(String filePath, String content);
-		
+		resultOfRe headline = matchFile(pattern1, textFile);
+		System.out.println("match text successfully");
+		resultOfRe text = matchFile(pattern2, textFile);
+		System.out.println("match headline successfully");
+		resultOfRe pagination = matchFile(pattern3, textFile);
+		System.out.println("match docno successfully");
+		try {
+			removeAndCF(text, headline, pagination);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	//read file;
-	public static resultOfRe match(String pattern, String text) {
+	public static resultOfRe matchFile(String pattern, String text) {
 		ArrayList<String> terms = new ArrayList<String>();
 		ArrayList<Integer> start = new ArrayList<Integer>();
 		Pattern r=Pattern.compile(pattern);
@@ -48,6 +51,7 @@ public class index {
 	public static String readFileByChars(String filePath) {
 		File file = new File(filePath);
 		if(!file.exists() || !file.isFile()) {
+			System.out.println("No file");
 			return null;
 		}
 		StringBuffer content = new StringBuffer();
@@ -70,7 +74,7 @@ public class index {
 		return content.toString();
 	}
 	
-	public static void removeAndCF(resultOfRe text, resultOfRe headline, resultOfRe docNo){
+	public static void removeAndCF(resultOfRe text, resultOfRe headline, resultOfRe docNo) throws IOException{
 		ArrayList<String> terms_text = text.getTerms();
 		ArrayList<Integer> start_text = text.getStart();
 		ArrayList<String> terms_headline = headline.getTerms();
@@ -81,35 +85,59 @@ public class index {
 		int size_headline = terms_headline.size();
 		int size_doc=terms_doc.size();
 		int i = 0, j=0, w=0;
-		
+		FileWriter file_text = new FileWriter("text.txt",false);
+		FileWriter file_headline = new FileWriter("headline.txt",false);
+		FileWriter file_map = new FileWriter("map.txt",false);
+		System.out.println("Start deal with files");
 		while(i<size_doc-1) {
-			terms_text.set(j,Integer.toString(i)+terms_text.get(i).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
-			terms_headline.set(w,Integer.toString(i)+terms_headline.get(i).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			if(j<size_text) {
+			file_text.write(Integer.toString(i)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 			j++;
-			w++;
-			while(start_text.get(j)<start_doc.get(i+1)) {
-				terms_text.set(j,terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
-				j++;
 			}
-			while(start_headline.get(j)<start_doc.get(i+1)) {
-				terms_headline.set(i,terms_headline.get(i).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			if(w<size_headline) {
+				file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 				w++;
 			}
-		i++;
+			//System.out.println("Start deal");
+			while(j<size_text) {
+				while(start_text.get(j)<start_doc.get(i+1)){
+					System.out.println("deal with text");
+				file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+				
+			}
+				j++;
+			}
+			while(w<size_headline){ 
+				while(start_headline.get(w)<start_doc.get(i+1)){
+					System.out.println("deal with headline");
+					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+					
+			}
+				w++;
+			}
+			System.out.println(i);
+			i++;
+			file_map.write(Integer.toString(i)+"-"+terms_doc.get(i)+"\\n");
+			file_text.flush();
+			file_headline.flush();
+			file_map.flush();
 		}
+		file_text.close();
+		file_headline.close();
+		file_map.close();
+		System.out.println("finish indexing");
 	}
 	
-	public static void mapInfo() {
+	//public static void mapInfo() {
 		
-	}
+	//}
 	
-	public static void writeFileByFileWriter(String filePath, String content) throws IOException{  
-        File file = new File(filePath);
-        synchronized (file) {  
-            FileWriter fw = new FileWriter(filePath);  
-            fw.write(content);  
-            fw.close();
-        }  
+	//public static void writeFileByFileWriter(String filePath, String content) throws IOException{  
+      //  File file = new File(filePath);
+        //synchronized (file) {  
+          //  FileWriter  = new FileWriter(filePath);  
+            //fw.write(content);  
+            //fw.close();
+        //}  
     }  
 	
-}
