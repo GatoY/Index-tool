@@ -86,6 +86,7 @@ public class index {
 		int size_headline = terms_headline.size();
 		System.out.println("size of headline"+Integer.toString(size_headline));
 		int size_doc=terms_doc.size();
+		System.out.println("size of map" + Integer.toString(size_doc));
 		int i = 0, j = 0, w = 0;
 		FileWriter file_text = new FileWriter("text.txt",false);
 		FileWriter file_headline = new FileWriter("headline.txt",false);
@@ -104,17 +105,12 @@ public class index {
 			//System.out.println(Integer.toString(start_doc.get(i+1)));
 				
 				while(j<size_text){
-					//System.out.println("deal with text");
-					
-                    
-                    
-                    	if(start_text.get(j)>start_doc.get(i+1)) {
-                    		
+					//System.out.println("deal with text");					
+                    	if(start_text.get(j)>start_doc.get(i+1)) {          		
                     		break;
                     	}
                     	file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
                     	j++;
-                
             }
 			}
 			if(w<size_headline) {
@@ -128,26 +124,41 @@ public class index {
 						break;
 					}	
 					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
-				w++;
+					w++;
 				}
 					
 				}
 			
-			//System.out.println("Start deal");
-			
-			//System.out.println(i);
-			i++;
+			//System.out.println("Start deal")
+			//System.out.println(i);		
 			file_map.write(Integer.toString(i)+"-"+terms_doc.get(i)+"\\n");
 			file_text.flush();
 			file_headline.flush();
 			file_map.flush();
+			System.out.println(i);
+			i++;
 		}
-		while(j<size_text) {
-			file_text.write(Integer.toString(i-1)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+		
+		if(j<size_text) {
+			//System.out.println("text write");
+			file_text.write(Integer.toString(i)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 			j++;
 		}
+		
+		if(w<size_headline) {
+			//System.out.println("headline write");
+			file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			w++;
+		}
+		
+		
+		while(j<size_text) {
+			file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			j++;
+		}
+		
 		while(w<size_headline) {
-			file_headline.write(Integer.toString(i-1)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 			w++;
 		}
 		file_text.close();
