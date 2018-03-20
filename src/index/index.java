@@ -6,11 +6,11 @@ public class index {
 	//main function
 	public static void main( String args[]) {
 		//match HEADLINE.
-		String pattern1 = "<HEADLINE>([\\s\\S]*?)</HEADLINE>";
+		String pattern2 = "(<HEADLINE>([\\s\\S]*?)</HEADLINE>)";
 		//match TEXT.
-		String pattern2 = "<TEXT>([\\s\\S]*?)</TEXT>";
+		String pattern1 = "|(<TEXT>([\\s\\S]*?)</TEXT>)";
 		//match DOCNO
-		String pattern3 = "<DOCNO>([\\s\\S]*?)</DOCNO>";
+		String pattern3 = "|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
 		//Matcher m1 = r1.matcher(text);
 		//Matcher m2 = r2.matcher(text);
@@ -19,33 +19,48 @@ public class index {
 		//} else {
 		System.out.println("read successful");
 		//get result of Re.
-		resultOfRe headline = matchFile(pattern1, textFile);
-		System.out.println("match text successfully");
-		resultOfRe text = matchFile(pattern2, textFile);
-		System.out.println("match headline successfully");
-		resultOfRe pagination = matchFile(pattern3, textFile);
-		System.out.println("match docno successfully");
+		
+		matchFile(pattern1+pattern2+pattern3, textFile);
+		System.out.println("match successfully");
+		//resultOfRe text = matchFile(pattern2, textFile);
+		//System.out.println("match headline successfully");
+		//resultOfRe pagination = matchFile(pattern3, textFile);
+		//System.out.println("match docno successfully");
+		
+	}
+	//read file;
+	public static void matchFile(String pattern, String text) {
+		ArrayList<String> text_terms = new ArrayList<String>();
+		ArrayList<Integer> text_start = new ArrayList<Integer>();
+		ArrayList<String> headline_terms = new ArrayList<String>();
+		ArrayList<Integer> headline_start = new ArrayList<Integer>();
+		ArrayList<String> doc_terms = new ArrayList<String>();
+		ArrayList<Integer> doc_start = new ArrayList<Integer>();
+		Pattern r=Pattern.compile(pattern);
+		Matcher m=r.matcher(text);
+		while(m.find()) {
+			if(m.group(1) != null) {
+				text_terms.add(m.group(1));
+				text_start.add(m.start(1));
+			}
+			if(m.group(2)!=null) {
+				headline_terms.add(m.group(2));
+				headline_start.add(m.start(2));
+			}
+			if(m.group(3)!=null) {doc_terms.add(m.group(3));
+				doc_start.add(m.start(3));
+		}
+			}
+		resultOfRe text_outcome = new resultOfRe(text_terms, text_start);
+		resultOfRe headline_outcome = new resultOfRe(headline_terms, text_start);
+		resultOfRe doc_outcome = new resultOfRe(doc_terms, doc_start);
 		try {
-			removeAndCF(text, headline, pagination);
+			removeAndCF(text_outcome, headline_outcome, doc_outcome);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	//read file;
-	public static resultOfRe matchFile(String pattern, String text) {
-		ArrayList<String> terms = new ArrayList<String>();
-		ArrayList<Integer> start = new ArrayList<Integer>();
-		Pattern r=Pattern.compile(pattern);
-		Matcher m=r.matcher(text);
-		while(m.find()) {
-			for(int i = 0; i<m.groupCount(); i++) {
-				terms.add(m.group(i));
-				start.add(m.start());
-			}
-		}
-		resultOfRe outcome = new resultOfRe(terms, start);
-		return outcome;
+		
 	}
 	
 	public static String readFileByChars(String filePath) {
@@ -126,7 +141,6 @@ public class index {
 					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 					w++;
 				}
-					
 				}
 			
 			//System.out.println("Start deal")
