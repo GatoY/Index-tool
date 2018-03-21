@@ -1,35 +1,85 @@
 package index;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.regex.*;
 import java.io.*;
 public class index {
 	//main function
 	public static void main( String args[]) {
-		//match HEADLINE.
-		String pattern2 = "(<HEADLINE>([\\s\\S]*?)</HEADLINE>)";
-		//match TEXT.
-		String pattern1 = "|(<TEXT>([\\s\\S]*?)</TEXT>)";
-		//match DOCNO
-		String pattern3 = "|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
-		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
-		//Matcher m1 = r1.matcher(text);
-		//Matcher m2 = r2.matcher(text);
-		//if (m1.find()) {
-			//pass
-		//} else {
-		System.out.println("read successful");
-		//get result of Re.
 		
-		matchFile(pattern1+pattern2+pattern3, textFile);
-		System.out.println("match successfully");
-		//resultOfRe text = matchFile(pattern2, textFile);
-		//System.out.println("match headline successfully");
-		//resultOfRe pagination = matchFile(pattern3, textFile);
-		//System.out.println("match docno successfully");
+		//start
+		/*long startTime=System.currentTimeMillis();
+		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
+		
+		//read file.
+		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
+		System.out.println("read successful");
+		
+		//get result of Re and deal with it.
+		resultOfRe[] outcome =  matchFile(pattern, textFile);
+		textFile=null;
+		try {
+			removeAndCF(outcome);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		outcome=null;
+		*/
+		
+		//String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
+		
+		if(true) {
+			System.out.println("Start stopping");
+			String filename = "/Users/Jason/desktop/javaMelb/Index Tool/src/index/stoplist";
+			try {
+				Hashtable<String, Integer> stoppers = readAndHash(filename);
+				String text = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/text.txt");
+			
+				String headline = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/headline.txt");
+				if(text!=null & headline!=null) {
+				matchFileAndPrint(text, stoppers,"text_stop.txt");
+				matchFileAndPrint(headline, stoppers, "headline_stop.txt");
+				}
+				else {
+					System.out.println("text.txt or headline.txt doesn't exist");
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		System.out.println("match and deal successfully");
+		long endTime=System.currentTimeMillis();
+		//System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 		
 	}
-	//read file;
-	public static void matchFile(String pattern, String text) {
+	
+	public static void matchFileAndPrint(String text, Hashtable<String, Integer> stoppers, String filename) {
+		System.out.println("match and print start");
+		String[] words = text.split(" ");
+		text="";
+		System.out.println("split done");
+		for(int i=0; i<words.length;i++) {
+			if(stoppers.get(words[i])!=1) {
+				text=text+words[i];
+			}
+		}
+		System.out.println("hash dealing done");
+		System.out.println(text);
+		try {
+			FileWriter file_text = new FileWriter(filename,false);
+			file_text.write(text);
+			file_text.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	//match file;
+	public static resultOfRe[] matchFile(String pattern, String text) {
 		ArrayList<String> text_terms = new ArrayList<String>();
 		ArrayList<Integer> text_start = new ArrayList<Integer>();
 		ArrayList<String> headline_terms = new ArrayList<String>();
@@ -39,27 +89,27 @@ public class index {
 		Pattern r=Pattern.compile(pattern);
 		Matcher m=r.matcher(text);
 		while(m.find()) {
-			if(m.group(1) != null) {
-				text_terms.add(m.group(1));
-				text_start.add(m.start(1));
+			
+			if(m.group(2) != null) {
+				text_terms.add(m.group(2));
+				text_start.add(m.start(2));
+				//System.out.println(m.group(2));
 			}
-			if(m.group(2)!=null) {
-				headline_terms.add(m.group(2));
-				headline_start.add(m.start(2));
+			if(m.group(4)!=null) {
+				headline_terms.add(m.group(4));
+				headline_start.add(m.start(4));
+				//System.out.println(m.group(4));
 			}
-			if(m.group(3)!=null) {doc_terms.add(m.group(3));
-				doc_start.add(m.start(3));
+			if(m.group(6)!=null) {
+				doc_terms.add(m.group(6));
+				doc_start.add(m.start(6));
 		}
 			}
-		resultOfRe text_outcome = new resultOfRe(text_terms, text_start);
-		resultOfRe headline_outcome = new resultOfRe(headline_terms, text_start);
-		resultOfRe doc_outcome = new resultOfRe(doc_terms, doc_start);
-		try {
-			removeAndCF(text_outcome, headline_outcome, doc_outcome);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		resultOfRe[] outcome = new resultOfRe[3];
+		outcome[0] = new resultOfRe(text_terms, text_start);
+		outcome[1] = new resultOfRe(headline_terms, headline_start);
+		outcome[2] = new resultOfRe(doc_terms, doc_start);
+		return outcome;
 		
 	}
 	
@@ -86,16 +136,17 @@ public class index {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println(filePath+"read successfully");
 		return content.toString();
 	}
 	
-	public static void removeAndCF(resultOfRe text, resultOfRe headline, resultOfRe docNo) throws IOException{
-		ArrayList<String> terms_text = text.getTerms();
-		ArrayList<Integer> start_text = text.getStart();
-		ArrayList<String> terms_headline = headline.getTerms();
-		ArrayList<Integer> start_headline = headline.getStart();
-		ArrayList<String> terms_doc = docNo.getTerms();
-		ArrayList<Integer> start_doc = docNo.getStart();
+	public static void removeAndCF(resultOfRe[] outcome) throws IOException{
+		ArrayList<String> terms_text = outcome[0].getTerms();
+		ArrayList<Integer> start_text = outcome[0].getStart();
+		ArrayList<String> terms_headline = outcome[1].getTerms();
+		ArrayList<Integer> start_headline = outcome[1].getStart();
+		ArrayList<String> terms_doc = outcome[2].getTerms();
+		ArrayList<Integer> start_doc = outcome[2].getStart();
 		int size_text = terms_text.size();
 		System.out.println("size of text"+Integer.toString(size_text));
 		int size_headline = terms_headline.size();
@@ -128,28 +179,24 @@ public class index {
                     	j++;
             }
 			}
+
 			if(w<size_headline) {
-				//System.out.println("headline write");
 				file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 				w++;
 				while(w<size_headline){ 
-					
-						//System.out.println("deal with headline");
 					if(start_headline.get(w)>start_doc.get(i+1)){
 						break;
 					}	
+					//System.out.println("111111");
 					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 					w++;
 				}
-				}
+			}
 			
-			//System.out.println("Start deal")
-			//System.out.println(i);		
 			file_map.write(Integer.toString(i)+"-"+terms_doc.get(i)+"\\n");
 			file_text.flush();
 			file_headline.flush();
 			file_map.flush();
-			System.out.println(i);
 			i++;
 		}
 		
@@ -175,22 +222,27 @@ public class index {
 			file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
 			w++;
 		}
+		
 		file_text.close();
 		file_headline.close();
 		file_map.close();
 		System.out.println("finish indexing");
 	}
 	
-	//public static void mapInfo() {
-		
-	//}
+	public static Hashtable<String, Integer> readAndHash(String filename) throws IOException {
+		Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
+		FileReader fr=new FileReader(filename);
+        BufferedReader br=new BufferedReader(fr);
+        String line="";
+        int value = 1;
+        while ((line=br.readLine())!=null) {
+            stoppers.put(line, value);
+        }
+        br.close();
+        fr.close();
+        System.out.println("get stoppers");
+        return stoppers;
+    }
+
 	
-	//public static void writeFileByFileWriter(String filePath, String content) throws IOException{  
-      //  File file = new File(filePath);
-        //synchronized (file) {  
-          //  FileWriter  = new FileWriter(filePath);  
-            //fw.write(content);  
-            //fw.close();
-        //}  
-    }  
-	
+}  	
