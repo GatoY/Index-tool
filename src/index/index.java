@@ -33,18 +33,11 @@ public class index {
 			System.out.println("Start stopping");
 			String filename = "/Users/Jason/desktop/javaMelb/Index Tool/src/index/stoplist";
 			try {
-				Hashtable<String, Integer> stoppers = readAndHash(filename);
-				String text = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/text.txt");
-			
-				String headline = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/headline.txt");
-				if(text!=null & headline!=null) {
-				matchFileAndPrint(text, stoppers,"text_stop.txt");
-				matchFileAndPrint(headline, stoppers, "headline_stop.txt");
+				Hashtable<String, Integer> stoppers = readAndHash(filename);			
+				matchFileAndPrint(stoppers,"/Users/Jason/desktop/javaMelb/Index Tool/src/index/text.txt");
+				matchFileAndPrint(stoppers, "/Users/Jason/desktop/javaMelb/Index Tool/src/index/headline.txt");
 				}
-				else {
-					System.out.println("text.txt or headline.txt doesn't exist");
-				}
-			} catch (IOException e) {
+			catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -56,27 +49,57 @@ public class index {
 		
 	}
 	
-	public static void matchFileAndPrint(String text, Hashtable<String, Integer> stoppers, String filename) {
-		System.out.println("match and print start");
-		String[] words = text.split(" ");
-		text="";
-		System.out.println("split done");
-		for(int i=0; i<words.length;i++) {
-			if(stoppers.get(words[i])!=1) {
-				text=text+words[i];
-			}
-		}
+	public static void matchFileAndPrint2(Hashtable<String, Integer> stoppers, String filePath) throws IOException {
+		
+		FileReader fr=new FileReader(filePath);
+        BufferedReader br=new BufferedReader(fr);
+        String line="";
+        System.out.println("match and print start");
+        while ((line=br.readLine())!=null) {
+        		System.out.println(line.length());
+        		break;
+        }
+        br.close();
+        fr.close();
 		System.out.println("hash dealing done");
-		System.out.println(text);
-		try {
-			FileWriter file_text = new FileWriter(filename,false);
-			file_text.write(text);
-			file_text.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
+	
+public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String filePath) throws IOException {
+        File file = new File(filePath);
+        if(!file.exists() || !file.isFile()) {
+    			System.out.println("No file");
+    			return;
+    		}
+    		try {
+    			char[] temp = new char[1024];
+    			FileInputStream fileInputStream = new FileInputStream(file);
+    			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "GBK");
+    		
+    			while(inputStreamReader.read(temp) != -1) {
+    				String[] words = new String(temp).split(" ");
+    				//System.out.println(new String(temp));
+    				//System.out.println(stoppers.get(words[0]));
+    				for(int i=0; i<words.length;i++) {
+    					//System.out.println(i);
+    					//System.out.println(words[i]);
+    					if(stoppers.get(words[i])==null) {
+    						//System.out.println(2);
+    						System.out.println(words[i]);
+    					}
+    				}
+    				temp = new char[1024];
+    		}
+    		fileInputStream.close();
+    		inputStreamReader.close();
+    	}catch(FileNotFoundException e) {
+    		e.printStackTrace();
+    	}catch(IOException e) {
+    		e.printStackTrace();
+    	}   
+		System.out.println("hash dealing done");
+	}
+	
+	
 	
 	//match file;
 	public static resultOfRe[] matchFile(String pattern, String text) {
