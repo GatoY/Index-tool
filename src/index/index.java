@@ -9,6 +9,7 @@ public class index {
 		
 		//start
 		long startTime=System.currentTimeMillis();
+		
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		
 		//read file.
@@ -17,7 +18,7 @@ public class index {
 		
 		//get result of Re and deal with it.
 		resultOfRe[] outcome =  matchFile(pattern, textFile);
-		textFile=null;
+		
 		try {
 			removeAndCF(outcome);
 		} catch (IOException e) {
@@ -43,23 +44,34 @@ public class index {
 			}
 			
 		}
-		String fromFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/src/index/text.txt";
-		String toFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/src/index/InvertedText.txt";
-		String fromFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/src/index/headline.txt";
-		String toFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/src/index/InvertedHeadline.txt";
-				
-		InvertedIndex invertedindexText = new InvertedIndex(fromFilePathOfText, toFilePathOfText);
-		InvertedIndex invertedindexHeadline = new InvertedIndex(fromFilePathOfHeadLine, toFilePathOfHeadLine);
 		
+		String fromFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/text.txt";
+		String toFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/Text";
+		String fromFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/headline.txt";
+		String toFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/Headline";
+		
+		
+		InvertedIndex invertedindexText = new InvertedIndex(fromFilePathOfText, toFilePathOfText);
+		InvertedIndex invertedindexHeadline =new InvertedIndex(fromFilePathOfHeadLine, toFilePathOfHeadLine);
 		try {
+			System.out.println("Start headline read and deal");
+			
 			invertedindexText.readAndDeal();
+			System.out.println("text read and deal done");
+			invertedindexText.writeResult();
+			System.out.println("InvertedText done");
+			
 			invertedindexHeadline.readAndDeal();
+			invertedindexText.writeResult();
+			System.out.println("InvertedHeadline done");
+			
+			
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		System.out.println("match and deal successfully");
 		long endTime=System.currentTimeMillis();
 		System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
@@ -99,7 +111,7 @@ public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String
     				for(int i=0; i<words.length;i++) {
     					//System.out.println(i);
     					//System.out.println(words[i]);
-    					if(stoppers.get(words[i])==null) {
+    					if(stoppers.containsKey(words[i])) {
     						//System.out.println(2);
     						System.out.println(words[i]);
     					}
@@ -233,7 +245,7 @@ public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String
 				}
 			}
 			
-			file_map.write(Integer.toString(i)+terms_doc.get(i)+" ");
+			file_map.write(Integer.toString(i)+terms_doc.get(i)+"\t\n");
 			file_text.flush();
 			file_headline.flush();
 			file_map.flush();
