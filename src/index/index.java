@@ -8,7 +8,7 @@ public class index {
 	public static void main( String args[]) {
 		
 		//start
-		/*long startTime=System.currentTimeMillis();
+		long startTime=System.currentTimeMillis();
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		
 		//read file.
@@ -25,7 +25,7 @@ public class index {
 			e.printStackTrace();
 		}
 		outcome=null;
-		*/
+		
 		
 		//String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
 		
@@ -43,13 +43,30 @@ public class index {
 			}
 			
 		}
+		String fromFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/src/index/text.txt";
+		String toFilePathOfText="/Users/Jason/desktop/javaMelb/Index Tool/src/index/InvertedText.txt";
+		String fromFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/src/index/headline.txt";
+		String toFilePathOfHeadLine="/Users/Jason/desktop/javaMelb/Index Tool/src/index/InvertedHeadline.txt";
+				
+		InvertedIndex invertedindexText = new InvertedIndex(fromFilePathOfText, toFilePathOfText);
+		InvertedIndex invertedindexHeadline = new InvertedIndex(fromFilePathOfHeadLine, toFilePathOfHeadLine);
+		
+		try {
+			invertedindexText.readAndDeal();
+			invertedindexHeadline.readAndDeal();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		System.out.println("match and deal successfully");
 		long endTime=System.currentTimeMillis();
-		//System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
+		System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 		
 	}
 	
-	public static void matchFileAndPrint2(Hashtable<String, Integer> stoppers, String filePath) throws IOException {
+/*	public static void matchFileAndPrint2(Hashtable<String, Integer> stoppers, String filePath) throws IOException {
 		
 		FileReader fr=new FileReader(filePath);
         BufferedReader br=new BufferedReader(fr);
@@ -63,7 +80,7 @@ public class index {
         fr.close();
 		System.out.println("hash dealing done");
 	}
-	
+*/	
 public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String filePath) throws IOException {
         File file = new File(filePath);
         if(!file.exists() || !file.isFile()) {
@@ -184,7 +201,7 @@ public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String
 		while(i<size_doc-1) {
 			if(j<size_text) {
 				//System.out.println("text write");
-			file_text.write(Integer.toString(i)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_text.write("FileNo"+Integer.toString(i)+" "+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 			j++;
 			//System.out.println(j);
 			//System.out.println(size_text);
@@ -198,25 +215,25 @@ public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String
                     	if(start_text.get(j)>start_doc.get(i+1)) {          		
                     		break;
                     	}
-                    	file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+                    	file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
                     	j++;
             }
 			}
 
 			if(w<size_headline) {
-				file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+				file_headline.write("FileNo"+Integer.toString(i)+" "+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 				w++;
 				while(w<size_headline){ 
 					if(start_headline.get(w)>start_doc.get(i+1)){
 						break;
 					}	
 					//System.out.println("111111");
-					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+					file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 					w++;
 				}
 			}
 			
-			file_map.write(Integer.toString(i)+"-"+terms_doc.get(i)+"\\n");
+			file_map.write(Integer.toString(i)+terms_doc.get(i)+" ");
 			file_text.flush();
 			file_headline.flush();
 			file_map.flush();
@@ -225,24 +242,24 @@ public static void matchFileAndPrint(Hashtable<String, Integer> stoppers, String
 		
 		if(j<size_text) {
 			//System.out.println("text write");
-			file_text.write(Integer.toString(i)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_text.write(Integer.toString(i)+terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 			j++;
 		}
 		
 		if(w<size_headline) {
 			//System.out.println("headline write");
-			file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_headline.write(Integer.toString(i)+terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 			w++;
 		}
 		
 		
 		while(j<size_text) {
-			file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_text.write(terms_text.get(j).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 			j++;
 		}
 		
 		while(w<size_headline) {
-			file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase());
+			file_headline.write(terms_headline.get(w).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase()+"\t\n");
 			w++;
 		}
 		
