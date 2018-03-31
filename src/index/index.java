@@ -9,7 +9,7 @@ public class index {
 		long startTime=System.currentTimeMillis();
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		//read file.
-		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
+		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes-100");
 		System.out.println("read successful");
 		InvertedIndex invertedindex = new InvertedIndex();
 		try {
@@ -20,23 +20,17 @@ public class index {
 		}
 		//String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
 		int i = 1;
-		if(i==2) {
+		if(i==1) {
 			System.out.println("Start stopping");
 			String filename = "/Users/Jason/desktop/javaMelb/Index Tool/src/index/stoplist";			
 			Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
 			try {
 				stoppers = readAndHash(filename);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-			//stoppers.containsKey(words[i]);
-			try {
 				invertedindex.writeResultWithStoppers(stoppers);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}		
+			}			
 		}
 		else {
 		try {
@@ -45,7 +39,6 @@ public class index {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("match and deal successfully");
 		long endTime=System.currentTimeMillis();
 		System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 	}
@@ -58,10 +51,10 @@ public class index {
 		Pattern r=Pattern.compile(pattern);
 		Matcher m=r.matcher(text);
 		Integer count = 0;
-		FileWriter map = new FileWriter("map.txt",false);
+		FileWriter map = new FileWriter("map",false);
 		while(m.find()) {
 			if(m.group(6)!=null) {
-				map.write(count+" "+m.group(6)+"\t\n");
+				map.write(count+m.group(6)+"\n");
 				map.flush();
 				count++;
 				terms=terms+"FileNo"+count.toString()+" ";

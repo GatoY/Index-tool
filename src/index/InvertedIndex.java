@@ -24,35 +24,35 @@ public class InvertedIndex {
 	public void writeResult() throws IOException {
 		System.out.println("start write");
 		Iterator<String> keyList = this.wordList.keySet().iterator();
-		FileWriter lexicon = new FileWriter("lexicon.txt",false);
-		FileWriter invlists = new FileWriter("invlists.txt",false);
+		FileWriter lexicon = new FileWriter("lexicon",false);
+		FileWriter invlists = new FileWriter("invlists",false);
 		//FileWriter map = new FileWriter("map.txt",false);
 		//countOfInvertedList shows which line of invertedList of the word lies in invlists.txt
-		Integer countOfInvertedList=1;
-		System.out.println(wordList.size());
+		Integer countOfInvertedList=0;
+		//System.out.println(wordList.size());
 		while(keyList.hasNext()) {
-			System.out.println(countOfInvertedList);
+			//System.out.println(countOfInvertedList);
 			String word = keyList.next();
 			String result = this.wordList.get(word).result();
-			lexicon.write(word+countOfInvertedList.toString()+"\t\n");
-			invlists.write(result+"\t\n");
+			lexicon.write(word+"-"+countOfInvertedList.toString()+"\n");
+			invlists.write(result+"\n");
 			countOfInvertedList++;
 		}
 		
 		lexicon.close();
 		invlists.close();
-		System.out.println("write done");
+		//System.out.println("write done");
 	}
 	
 	public void writeResultWithStoppers(Hashtable<String, Integer> stoppers) throws IOException {
-		System.out.println("start write");
+		//System.out.println("start write");
 		Iterator<String> keyList = this.wordList.keySet().iterator();
-		FileWriter lexicon = new FileWriter("lexicon.txt",false);
-		FileWriter invlists = new FileWriter("invlists.txt",false);
+		FileWriter lexicon = new FileWriter("lexicon",false);
+		FileWriter invlists = new FileWriter("invlists",false);
 		//FileWriter map = new FileWriter("map.txt",false);
 		//countOfInvertedList shows which line of invertedList of the word lies in invlists.txt
-		Integer countOfInvertedList=1;
-		System.out.println(wordList.size());
+		Integer countOfInvertedList=0;
+		//System.out.println(wordList.size());
 		while(keyList.hasNext()) {
 			String word = keyList.next();
 			String result = this.wordList.get(word).result();
@@ -60,7 +60,7 @@ public class InvertedIndex {
 				continue;
 			}
 			System.out.println(word);
-			lexicon.write(word+countOfInvertedList.toString()+"\t\n");
+			lexicon.write(word+"-"+countOfInvertedList.toString()+"\t\n");
 			invlists.write(result+"\t\n");
 			countOfInvertedList++;
 		}

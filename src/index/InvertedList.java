@@ -28,7 +28,7 @@ public class InvertedList {
 		for(Entry<Integer, Integer> entry:docAndNo.entrySet()){
 			Integer docNo = entry.getKey();
 			Integer num = entry.getValue();
-			count = count+num;
+			count = count+1;
 			resultOfWord=resultOfWord+" "+docNo.toString()+" "+num.toString();
 			}
 		resultOfWord=count.toString()+resultOfWord;
