@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+//record word inverted info in hashtable.
 public class InvertedIndex { 
 	private Hashtable<String, InvertedList> wordList=new Hashtable<String, InvertedList>();
 	public InvertedIndex() {		
@@ -20,18 +21,17 @@ public class InvertedIndex {
 			}
 		}    
 	}
-	
+    
+	//write the info
 	public void writeResult() throws IOException {
 		System.out.println("start write");
 		Iterator<String> keyList = this.wordList.keySet().iterator();
 		FileWriter lexicon = new FileWriter("lexicon",false);
 		FileWriter invlists = new FileWriter("invlists",false);
-		//FileWriter map = new FileWriter("map.txt",false);
-		//countOfInvertedList shows which line of invertedList of the word lies in invlists.txt
+        
+        //countOfInvertedList shows which line of invertedList of the word lies in invlists
 		Integer countOfInvertedList=0;
-		//System.out.println(wordList.size());
 		while(keyList.hasNext()) {
-			//System.out.println(countOfInvertedList);
 			String word = keyList.next();
 			String result = this.wordList.get(word).result();
 			lexicon.write(word+"-"+countOfInvertedList.toString()+"\n");
@@ -41,18 +41,15 @@ public class InvertedIndex {
 		
 		lexicon.close();
 		invlists.close();
-		//System.out.println("write done");
 	}
 	
+    //write the info using stoplist
 	public void writeResultWithStoppers(Hashtable<String, Integer> stoppers) throws IOException {
-		//System.out.println("start write");
 		Iterator<String> keyList = this.wordList.keySet().iterator();
 		FileWriter lexicon = new FileWriter("lexicon",false);
 		FileWriter invlists = new FileWriter("invlists",false);
-		//FileWriter map = new FileWriter("map.txt",false);
 		//countOfInvertedList shows which line of invertedList of the word lies in invlists.txt
 		Integer countOfInvertedList=0;
-		//System.out.println(wordList.size());
 		while(keyList.hasNext()) {
 			String word = keyList.next();
 			String result = this.wordList.get(word).result();
@@ -67,7 +64,6 @@ public class InvertedIndex {
 		
 		lexicon.close();
 		invlists.close();
-		System.out.println("write done");
 	}
 	
 }

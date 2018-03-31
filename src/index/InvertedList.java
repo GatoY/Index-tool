@@ -4,9 +4,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+//data structure of invertedList which records the page of the word coming up and frequency.
 public class InvertedList {
 	private Hashtable<Integer, Integer> docAndNo=new Hashtable<Integer, Integer>();
-	
 	public InvertedList(Integer docNo) {	
 		this.docAndNo.put(docNo, 1);	
 	}

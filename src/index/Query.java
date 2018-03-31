@@ -7,6 +7,8 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+//usage: args[0]: lexicon file; args[1]:invlists file;
+//args[2] map file; args[3]-[n]: word you want to query.
 public class Query {
 	public static void main(String args[]) {
 		String lexiconPath=args[0];
@@ -24,37 +26,25 @@ public class Query {
 					lines.put(lexicon.get(words[i]), words[i]);
 				}
 			}
-			//System.out.println("getInvlists");
 			getInvlistsAndMap(lines, map, invlistsPath);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	private static void getInvlistsAndMap(Hashtable<String, String> lines, Hashtable<String,String> map, String invlistsPath) throws IOException {
-		File file = new File(invlistsPath);//文件路径  
+		File file = new File(invlistsPath);//filepath
         FileReader fileReader = new FileReader(file);  
         LineNumberReader reader = new LineNumberReader(fileReader); 
         String txt=reader.readLine();
-        Integer count = 0;  
-        //System.out.println(lines.size());
-        for(String key: lines.keySet()) {
-        	//	System.out.println(key);
-        }
-        while (txt != null) {   
-        		//System.out.println(txt);
-        		
-        		//System.out.println(lines.keys());
-        		
+        Integer count = 0;
+        while (txt != null) {
             if (lines.containsKey(count.toString())) {  
                 String[] invlist=txt.split(" ");
                 System.out.println(lines.get(count.toString()));
                 System.out.println(invlist[0]);
-                
                 for(int j=1;j<invlist.length;j=j+2) {
                 		System.out.println(map.get(invlist[j])+" "+invlist[j+1]);
-                		
                 }
             }
             count++;
@@ -65,6 +55,7 @@ public class Query {
 		
 	}
 
+    //record mapinfo in hashtable;
 	public static Hashtable<String, String> readMapByLines(String filePath) throws IOException {
 		File file = new File(filePath);
 		FileReader fileReader = new FileReader(file);
@@ -86,6 +77,7 @@ public class Query {
 		return mapList;
 	}
 	
+    //record lexiconinfo in hashtable;
 	public static Hashtable<String, String> readLexiconByLines(String filePath) throws IOException {
 		File file = new File(filePath);
 		FileReader fileReader = new FileReader(file);

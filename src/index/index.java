@@ -5,9 +5,12 @@ import java.io.*;
 public class index {
 	//main function
 	public static void main( String args[]) {
+        //variable decides whether to use stoplist.
 		int stopOrNot=0;
 		String stoplistPath="";
 		String sourcefile="";
+        
+        //parse the commandline
 		if(args[0]=="-s") {
 			stopOrNot=1;
 			stoplistPath=args[1];
@@ -18,43 +21,41 @@ public class index {
 		}
 		
 		//start
-		long startTime=System.currentTimeMillis();
+		//long startTime=System.currentTimeMillis();
+        
+        //match pattern
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		//read file.
 		String textFile = readFileByChars(sourcefile);
-		//System.out.println("read successful");
 		InvertedIndex invertedindex = new InvertedIndex();
 		try {
+            //match file.
 			matchFile(pattern, textFile, invertedindex);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		//String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
+		
 		if(stopOrNot==1) {
 			System.out.println("Start stopping");			
 			Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
 			try {
+                //get the words needed to stop.
 				stoppers = readAndHash(stoplistPath);
+                //wrtie
 				invertedindex.writeResultWithStoppers(stoppers);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}			
 		}
 		else {
 		try {
+            //write
 			invertedindex.writeResult();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		long endTime=System.currentTimeMillis();
-		System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 	}
 	}
-	
-	
 	
 	public static void matchFile(String pattern, String text, InvertedIndex invertedindex) throws IOException {
 		String terms = "";
@@ -64,27 +65,27 @@ public class index {
 		FileWriter map = new FileWriter("map",false);
 		while(m.find()) {
 			if(m.group(6)!=null) {
+                //map info.
 				map.write(count+m.group(6)+"\n");
 				map.flush();
 				count++;
 				terms=terms+"FileNo"+count.toString()+" ";
 		}
-			
 			if(m.group(2) != null) {
+                //text
 				String[] words =m.group(2).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase().split(" ");
 				invertedindex.readAndDeal(words,count);
-				
-				//System.out.println(m.group(2));
 			}
 			if(m.group(4)!=null) {
+                //headline
 				String[] words =m.group(4).replaceAll("\\t|\r|\n|<.*?>|\\pP", "").toLowerCase().split(" ");
 				invertedindex.readAndDeal(words,count);
-				//System.out.println(m.group(4));
 			}
 			}
 		map.close();
 	}
 
+    //read file.
 	public static String readFileByChars(String filePath) {
 		File file = new File(filePath);
 		if(!file.exists() || !file.isFile()) {
@@ -96,7 +97,6 @@ public class index {
 			char[] temp = new char[1024];
 			FileInputStream fileInputStream = new FileInputStream(file);
 			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "GBK");
-			
 			while(inputStreamReader.read(temp) != -1) {
 				content.append(new String(temp));
 				temp = new char[1024];
@@ -108,10 +108,10 @@ public class index {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(filePath+"read successfully");
 		return content.toString();
 	}
 	
+    //record stoppers in hashtable
 	public static Hashtable<String, Integer> readAndHash(String filename) throws IOException {
 		Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
 		FileReader fr=new FileReader(filename);
@@ -123,7 +123,6 @@ public class index {
         }
         br.close();
         fr.close();
-        System.out.println("get stoppers");
         return stoppers;
     }
 }  	
