@@ -5,12 +5,24 @@ import java.io.*;
 public class index {
 	//main function
 	public static void main( String args[]) {
+		int stopOrNot=0;
+		String stoplistPath="";
+		String sourcefile="";
+		if(args[0]=="-s") {
+			stopOrNot=1;
+			stoplistPath=args[1];
+			sourcefile=args[3];
+		}
+		else {
+			sourcefile=args[1];
+		}
+		
 		//start
 		long startTime=System.currentTimeMillis();
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		//read file.
-		String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes-100");
-		System.out.println("read successful");
+		String textFile = readFileByChars(sourcefile);
+		//System.out.println("read successful");
 		InvertedIndex invertedindex = new InvertedIndex();
 		try {
 			matchFile(pattern, textFile, invertedindex);
@@ -19,13 +31,11 @@ public class index {
 			e1.printStackTrace();
 		}
 		//String textFile = readFileByChars("/Users/Jason/desktop/javaMelb/Index Tool/src/index/latimes");
-		int i = 1;
-		if(i==1) {
-			System.out.println("Start stopping");
-			String filename = "/Users/Jason/desktop/javaMelb/Index Tool/src/index/stoplist";			
+		if(stopOrNot==1) {
+			System.out.println("Start stopping");			
 			Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
 			try {
-				stoppers = readAndHash(filename);
+				stoppers = readAndHash(stoplistPath);
 				invertedindex.writeResultWithStoppers(stoppers);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
