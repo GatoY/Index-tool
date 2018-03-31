@@ -10,7 +10,7 @@ public class index {
 		String stoplistPath="";
 		String sourcefile="";
         
-        //parse the commandline
+        //parse the commandlines
 		if(args[0]=="-s") {
 			stopOrNot=1;
 			stoplistPath=args[1];
@@ -23,7 +23,7 @@ public class index {
 		//start
 		//long startTime=System.currentTimeMillis();
         
-        //match pattern
+        //match text, headline, docno labels in file.
 		String pattern ="(<TEXT>([\\s\\S]*?)</TEXT>)|(<HEADLINE>([\\s\\S]*?)</HEADLINE>)|(<DOCNO>([\\s\\S]*?)</DOCNO>)";
 		//read file.
 		String textFile = readFileByChars(sourcefile);
@@ -35,13 +35,12 @@ public class index {
 			e1.printStackTrace();
 		}
 		
-		if(stopOrNot==1) {
-			System.out.println("Start stopping");			
+		if(stopOrNot==1) {		
 			Hashtable<String, Integer> stoppers = new Hashtable<String, Integer>();
 			try {
                 //get the words needed to stop.
 				stoppers = readAndHash(stoplistPath);
-                //wrtie
+                //exclude the words in file stoplist out of the content.
 				invertedindex.writeResultWithStoppers(stoppers);
 			} catch (IOException e) {
 				e.printStackTrace();
